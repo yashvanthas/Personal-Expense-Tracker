@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#f5f7fb">
+    <title>{{ "Create account" if mode == "register" else "Sign in" }} · Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="auth-shell">
+      <section class="panel auth-panel">
+        <p class="eyebrow">PERSONAL FINANCE</p>
+        <h1>{{ "Create your account" if mode == "register" else "Welcome back" }}</h1>
+        <p class="auth-description">
+          {{ "Start tracking your income, expenses, and budgets." if mode == "register" else "Sign in to view your private expense tracker." }}
+        </p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="auth-messages" role="status" aria-live="polite">
+              {% for category, message in messages %}
+                <p class="auth-message {{ category }}">{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        <form method="post" class="auth-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label>
+            Email
+            <input name="email" type="email" maxlength="320" autocomplete="email" required value="{{ request.form.get('email', '') }}">
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" minlength="{{ 12 if mode == 'register' else 1 }}" maxlength="128" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" required>
+          </label>
+          {% if mode == "register" %}
+            <p class="password-hint">Use at least 12 characters. Use a unique password for this account.</p>
+          {% endif %}
+          <button class="button button-primary auth-submit" type="submit">
+            {{ "Create account" if mode == "register" else "Sign in" }}
+          </button>
+        </form>
+        <p class="auth-switch">
+          {% if mode == "register" %}
+            Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
+          {% else %}
+            New here? <a href="{{ url_for('auth.register') }}">Create an account</a>
+          {% endif %}
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
